@@ -1,0 +1,45 @@
+<html style="height: 100%">
+
+<head>
+    <title>Remote Control</title>
+    <script src='index.js'></script>
+</head>
+
+<body style="
+    background-image: url('/video_feed');
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;"
+    onload='init();'>
+    <div
+        style="position: absolute; top: 10%; left: 0; width: 15%; font-family: 'Inconsolata', monospace; color: white; background-color: rgba(0,0,0,0.5);">
+        <h3>Remote Controls</h3>
+        <hr>
+        <h4>Navigation</h4>
+        W/S - Move forward/backward
+        <br> A/D - Rotate left/right
+        <br>
+        <h4>System Status</h4>
+        <div id='stat_div' style="font-size: 16pt;">HALT/WAIT</div>
+        <br>
+        <table style="font-family: 'Inconsolata', monospace; color: white; padding:0px;">
+            <tr>
+                <td>Left PWM</td>
+                <td><progress value="10" max="100" id="left_pwm"></progress></td>
+            </tr>
+            <tr>
+                <td>Right PWM</td>
+                <td><progress value="10" max="100" id="right_pwm"></progress></td>
+            </tr>
+            <tr>
+                <td>Latency</td>
+                <td><div id='lag_div'></div></td>
+            </tr>
+        </table>
+        <hr>
+    </div>
+</body>
+
+</html>
