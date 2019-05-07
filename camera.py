@@ -19,7 +19,7 @@ class VideoCamera(object):
         logger.info("Streaming {W}x{H}x{C} frames...".format(W=W, H=H, C=C))
         self.__imbuf = Array('c', H*W*C)
         self.__halt_flag = Value('i', 0)
-        self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(640,480,C)
+        self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(120,240,C)
         
         self.last_blob = None
         self.img_proc = Process(target=self.__capture)
@@ -38,7 +38,7 @@ class VideoCamera(object):
             lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
             kp =  orb.detect(lf, None)
             cv2.drawKeypoints(frame, kp, frame)
-            self.last_frame[:,:,:] = cv2.resize(frame, (640, 480))
+            self.last_frame[:,:,:] = cv2.resize(frame, (240, 120))
             
 
     async def get_frame(self):
