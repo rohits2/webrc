@@ -65,4 +65,4 @@ async def telemetry_feed(request, ws):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=PORT, threaded=True)
+    app.run(host="0.0.0.0", port=PORT)
