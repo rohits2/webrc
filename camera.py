@@ -33,11 +33,13 @@ class VideoCamera(object):
 
     def __capture(self):
         orb = cv2.ORB_create()
+        i = 0
         while self.__halt_flag.value == 0:
             success, frame = self.video.read()
             H, W, C = frame.shape
-            lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-            kp =  orb.detect(lf, None)
+            if i % 10 = 0:
+                lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+                kp =  orb.detect(lf, None)
             cv2.drawKeypoints(frame, kp, frame)
             self.last_frame[:,:,:] = cv2.resize(frame, (W//4, H//4))
             
