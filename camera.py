@@ -5,8 +5,6 @@ from time import sleep as bsleep
 from asyncio import sleep, get_event_loop
 from loguru import logger
 
-from matplotlib import pyplot as plt
-
 class VideoCamera(object):
     def __init__(self):
         # Using OpenCV to capture from device 0. If you have trouble capturing
