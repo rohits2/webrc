@@ -18,7 +18,7 @@ class VideoCamera(object):
         self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
         _, image = self.video.read()
         H, W, C = image.shape
-        logger.info(f"Streaming {W}x{H}x{C} frames...")
+        logger.info("Streaming {W}x{H}x{C} frames...".format(W=W, H=H, C=C))
         self.__imbuf = Array('i', H*W*C//4)
         self.__halt_flag = Value('i', 0)
         self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H,W,C)
