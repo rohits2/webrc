@@ -4,7 +4,7 @@ from sanic import Sanic, response
 import json
 from jinja2 import Template
 from camera import VideoCamera
-from fake_robot import Robot
+from robot import Robot
 from asyncio import sleep
 from loguru import logger
 import cv2
