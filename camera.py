@@ -37,7 +37,7 @@ class VideoCamera(object):
         while self.__halt_flag.value == 0:
             success, frame = self.video.read()
             H, W, C = frame.shape
-            if i % 10 = 0:
+            if i % 10 == 0:
                 lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
                 kp =  orb.detect(lf, None)
             cv2.drawKeypoints(frame, kp, frame)
