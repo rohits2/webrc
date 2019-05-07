@@ -12,14 +12,14 @@ class VideoCamera(object):
         # instead.
         self.video = cv2.VideoCapture(0)
         logger.info("Opened Camera 0!")
-        self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+        self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
         _, image = self.video.read()
         H, W, C = image.shape
         logger.info("Streaming {W}x{H}x{C} frames...".format(W=W, H=H, C=C))
-        self.__imbuf = Array('c', H//4*W//4*C)
+        self.__imbuf = Array('c', H*W*C)
         self.__halt_flag = Value('i', 0)
-        self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H//4,W//4,C)
+        self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H,W,C)
         
         self.last_blob = None
         self.img_proc = Process(target=self.__capture)
@@ -41,7 +41,7 @@ class VideoCamera(object):
                 lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
                 kp =  orb.detect(lf, None)
             cv2.drawKeypoints(frame, kp, frame)
-            self.last_frame[:,:,:] = cv2.resize(frame, (W//4, H//4))
+            self.last_frame[:,:,:] = cv2.resize(frame, (W, H))
             
 
     async def get_frame(self):
