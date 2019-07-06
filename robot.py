@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import numpy as np
 from asyncio import sleep, ensure_future
 from datetime import datetime
 
@@ -26,8 +27,7 @@ class Robot:
         self.right_motor_fwd.start(0)
         self.right_motor_bck.start(0)
         self.sources = {}
-        self.left = 0
-        self.right = 0
+        self.lr = np.array([0., 0.])
         self.inertia = 0.25
         self.last_cmd = 0
         self.drive_task = None
@@ -48,15 +48,15 @@ class Robot:
 
     async def __update_drive(self):
         while True:
-            lefts, rights = zip(*self.sources.values())
-            left, right = sum(lefts), sum(rights)
-            left, right = max(-1, min(left, 1)), max(-1, min(right, 1))
+            inputs = np.array(self.sources.values())
+            input_lr = inputs.sum(dim=0)
 
             self.left = left*(1-self.inertia) + self.left*self.inertia
             self.right = right*(1-self.inertia) + self.right*self.inertia
 
-            regularizer = 2/abs(self.left+self.right)
-            self.left, self.right = power_curve(self.left, regularizer), power_curve(self.right, regularizer)
+            regularizer = abs(self.left+self.right)/2
+            self.left = (self.left + self.right*regularizer)/(1+regularizer)
+            self.right = (self.right + self.left*regularizer)/(1+regularizer)
             left, right = self.left, self.right
 
             if left >= 0:
