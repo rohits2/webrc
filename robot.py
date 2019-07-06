@@ -51,13 +51,15 @@ class Robot:
             inputs = np.array(self.sources.values())
             input_lr = inputs.sum(dim=0)
 
-            self.left = left*(1-self.inertia) + self.left*self.inertia
-            self.right = right*(1-self.inertia) + self.right*self.inertia
+            self.lr = input_lr*(1-self.inertia) + self.lr*self.inertia
 
-            regularizer = abs(self.left+self.right)/2
-            self.left = (self.left + self.right*regularizer)/(1+regularizer)
-            self.right = (self.right + self.left*regularizer)/(1+regularizer)
-            left, right = self.left, self.right
+            regularizer = abs(self.lr.sum())/2
+            lr_reg_matrix = np.eye(2)
+            lr_reg_matrix[0,1] = regularizer
+            lr_reg_matrix[1,0] = regularizer
+            self.lr = (lr_reg_matrix@self.lr)/(1+regularizer)
+
+            left, right = self.lr
 
             if left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
