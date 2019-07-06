@@ -51,8 +51,9 @@ class Robot:
 
             left, right = self.left, self.right
             if left*right >= 0:
-                left = (self.left*2+self.right)/3
-                right = (self.right*2+self.left)/3
+                delta = left-right
+                left -= delta/2
+                right += delta/2
 
             if self.left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
