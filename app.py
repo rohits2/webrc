@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from sanic import Sanic, response
+from sanic_compress import Compress
 import json
 from jinja2 import Template
 from camera import VideoCamera
@@ -10,7 +11,10 @@ from loguru import logger
 import cv2
 
 app = Sanic(__name__)
+app.config['COMPRESS_MIMETYPES'] = {'text/html', 'application/json', 'multipart/x-mixed-replace; boundary=frame'}
+Compress(app)
 app.enable_websocket()
+
 PORT = 5000
 
 cam = VideoCamera()
