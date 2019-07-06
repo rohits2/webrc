@@ -47,7 +47,7 @@ class VideoCamera(object):
             #encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
             #ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
             img = Image.fromarray(frame)
-            img.save(jpeg_buf, quality=80, optimize=True, progressive=True)
+            img.save(jpeg_buf, format="jpeg", quality=80, optimize=True, progressive=True)
             jpeg = np.frombuffer(jpeg_buf, dtype=np.uint8)
             print(jpeg.shape)
             bufsz, _ = jpeg.shape
