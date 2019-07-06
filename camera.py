@@ -48,11 +48,9 @@ class VideoCamera(object):
             #ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
             img = Image.fromarray(frame)
             img.save(jpeg_buf, format="jpeg", quality=80, optimize=True, progressive=True)
-            jpeg = np.frombuffer(jpeg_buf, dtype=np.uint8)
-            print(jpeg.shape)
-            bufsz, _ = jpeg.shape
-            self.__jpbufsz.value = bufsz
-            self.last_jpeg[:bufsz] = jpeg
+            jpeg = np.frombuffer(jpeg_buf.getbuffer(), dtype=np.uint8)
+            self.__jpbufsz.value = jpeg.shape[0]
+            self.last_jpeg[:jpeg.shape[0]] = jpeg
 
     async def get_frame(self):
         await sleep(0.001)
