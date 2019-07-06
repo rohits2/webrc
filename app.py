@@ -11,7 +11,7 @@ from loguru import logger
 import cv2
 
 app = Sanic(__name__)
-app.config['COMPRESS_MIMETYPES'] = {'text/html', 'application/json', 'multipart/x-mixed-replace; boundary=frame', 'image/jpeg'}
+app.config['COMPRESS_MIMETYPES'] = {'text/html', 'application/json', 'image/jpeg'}
 app.config['COMPRESS_LEVEL'] = 9
 Compress(app)
 app.enable_websocket()

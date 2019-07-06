@@ -16,7 +16,7 @@ class VideoCamera(object):
         H, W, C = image.shape
         logger.info("Streaming {W}x{H}x{C} frames...".format(W=W, H=H, C=C))
         self.__imbuf = Array('c', H * W * C)
-        self.__jpbuf = Array('c', H * W * C)
+        self.__jpbuf = Array('c', H * W * C * 2)
         self.__jpbufsz = Value('i', 0)
         self.__halt_flag = Value('i', 0)
         self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H, W, C)
@@ -42,8 +42,8 @@ class VideoCamera(object):
             #    kp =  orb.detect(lf, None)
             #cv2.drawKeypoints(frame, kp, frame)
             self.last_frame[:, :, :] = frame  #cv2.resize(frame, (W, H))
-            #encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 100]
-            ret, jpeg = cv2.imencode('.jpg', self.last_frame)  #, encode_param)
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
+            ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
             bufsz, _ = jpeg.shape
             self.__jpbufsz.value = bufsz
             self.last_jpeg[:bufsz] = jpeg
