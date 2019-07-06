@@ -1,9 +1,12 @@
 import cv2
+from PIL import Image
+from io import BytesIO
 import numpy as np
 from multiprocessing import Process, Array, Value
 from time import sleep as bsleep
 from asyncio import sleep, get_event_loop
 from loguru import logger
+
 
 
 class VideoCamera(object):
@@ -32,8 +35,7 @@ class VideoCamera(object):
         logger.info("Closed Camera 0.")
 
     def __capture(self):
-        orb = cv2.ORB_create()
-        i = 0
+        jpeg_buf = BytesIO()
         while self.__halt_flag.value == 0:
             success, frame = self.video.read()
             H, W, C = frame.shape
@@ -42,8 +44,11 @@ class VideoCamera(object):
             #    kp =  orb.detect(lf, None)
             #cv2.drawKeypoints(frame, kp, frame)
             self.last_frame[:, :, :] = frame  #cv2.resize(frame, (W, H))
-            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
-            ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
+            #encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
+            #ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
+            img = Image.fromarray(frame)
+            img.save(jpeg_buf, quality=80, optimize=True, progressive=True)
+            jpeg = np.frombuffer(jpeg_buf, dtype=np.uint8)
             bufsz, _ = jpeg.shape
             self.__jpbufsz.value = bufsz
             self.last_jpeg[:bufsz] = jpeg
