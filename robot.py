@@ -52,8 +52,8 @@ class Robot:
             left, right = sum(lefts), sum(rights)
             left, right = max(-1, min(left, 1)), max(-1, min(right, 1))
 
-            self.left = left*(1-inertia) + self.left*inertia
-            self.right = right*(1-inertia) + self.right*inertia
+            self.left = left*(1-self.inertia) + self.left*self.inertia
+            self.right = right*(1-self.inertia) + self.right*self.inertia
 
             regularizer = 2/abs(self.left+self.right)
             self.left, self.right = power_curve(self.left, regularizer), power_curve(self.right, regularizer)
