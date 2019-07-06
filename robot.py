@@ -6,6 +6,12 @@ LEFT_PINS = (38,40)
 RIGHT_PINS = (3,5)
 
 
+def sgn(x):
+    return 1 if x >= 0 else -1
+
+def power_curve(x, lmbda):
+    return sgn(x)*abs(x)**lmbda
+
 class Robot:
     def __init__(self):
         GPIO.setmode(GPIO.BOARD)
@@ -46,23 +52,21 @@ class Robot:
             left, right = sum(lefts), sum(rights)
             left, right = max(-1, min(left, 1)), max(-1, min(right, 1))
 
-            self.left = left*(1-self.inertia) + self.left*self.inertia
-            self.right = right*(1-self.inertia) + self.right*self.inertia
+            self.left = left*(1-inertia) + self.left*inertia
+            self.right = right*(1-inertia) + self.right*inertia
 
+            regularizer = 2/abs(self.left+self.right)
+            self.left, self.right = power_curve(self.left, regularizer), power_curve(self.right, regularizer)
             left, right = self.left, self.right
-            if left*right >= 0:
-                delta = left-right
-                left -= delta/2
-                right += delta/2
 
-            if self.left >= 0:
+            if left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
                 self.left_motor_fwd.ChangeDutyCycle(int(100*left))
             else:
                 self.left_motor_fwd.ChangeDutyCycle(0)
                 self.left_motor_bck.ChangeDutyCycle(int(-100*left))
 
-            if self.right >= 0:
+            if right >= 0:
                 self.right_motor_bck.ChangeDutyCycle(0)
                 self.right_motor_fwd.ChangeDutyCycle(int(100*right))
             else:
