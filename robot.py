@@ -19,17 +19,15 @@ class Robot:
         self.left_motor_bck.start(0)
         self.right_motor_fwd.start(0)
         self.right_motor_bck.start(0)
+        self.sources = {}
         self.left = 0
         self.right = 0
         self.inertia = 0.75
         self.last_cmd = 0
         self.drive_task = None
 
-    def drive(self, left, right, cmd_time=datetime.now().timestamp()):
-        self.left = self.left * self.inertia + (1 - self.inertia) * left
-        self.right = self.right * self.inertia + (1 - self.inertia) * right
-        self.left = min(max(self.left, -1), 1)
-        self.right = min(max(self.right, -1), 1)
+    def drive(self, left, right, cmd_time=datetime.now().timestamp(), source="tele"):
+        self.sources[source] = (left, right)
         self.last_cmd = cmd_time
         if self.drive_task is None:
             self.drive_task = self.__update_drive
@@ -44,17 +42,30 @@ class Robot:
 
     async def __update_drive(self):
         while True:
+            lefts, rights = zip(*self.sources.values())
+            left, right = sum(lefts), sum(rights)
+            left, right = max(0, min(left, 1)), max(0, min(right, 1))
+
+            self.left = left*(1-self.inertia) + self.left*self.inertia
+            self.right = right*(1-self.inertia) + self.right*self.inertia
+
+            if left*right >= 0:
+                left = (self.left*2+self.right)/3
+                right = (self.right*2+self.left)/3
+            else:
+                left, right = self.left, self.right
+
             if self.left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
-                self.left_motor_fwd.ChangeDutyCycle(int(100*self.left))
+                self.left_motor_fwd.ChangeDutyCycle(int(100*left))
             else:
                 self.left_motor_fwd.ChangeDutyCycle(0)
-                self.left_motor_bck.ChangeDutyCycle(int(-100*self.left))
+                self.left_motor_bck.ChangeDutyCycle(int(-100*left))
 
             if self.right >= 0:
                 self.right_motor_bck.ChangeDutyCycle(0)
-                self.right_motor_fwd.ChangeDutyCycle(int(100*self.right))
+                self.right_motor_fwd.ChangeDutyCycle(int(100*right))
             else:
                 self.right_motor_fwd.ChangeDutyCycle(0)
-                self.right_motor_bck.ChangeDutyCycle(int(-100*self.right))
+                self.right_motor_bck.ChangeDutyCycle(int(-100*right))
             await sleep(0.1)
