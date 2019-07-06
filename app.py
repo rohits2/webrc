@@ -36,7 +36,7 @@ async def index(request):
 async def frame_generator(resp):
     while True:
         frame = await cam.get_frame()
-        blob = (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
+        blob = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n'
         await resp.write(blob)
 
 
