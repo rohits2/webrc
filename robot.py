@@ -44,7 +44,7 @@ class Robot:
         while True:
             lefts, rights = zip(*self.sources.values())
             left, right = sum(lefts), sum(rights)
-            left, right = max(0, min(left, 1)), max(0, min(right, 1))
+            left, right = max(-1, min(left, 1)), max(-1, min(right, 1))
 
             self.left = left*(1-self.inertia) + self.left*self.inertia
             self.right = right*(1-self.inertia) + self.right*self.inertia
