@@ -61,6 +61,7 @@ class VideoCamera(object):
         last_idx = 0
         while self.__halt_flag.value == 0:
             while self.__frameidx.value == last_idx:
+                logger.info("Stalled on new frame")
                 continue
             ret, jpeg = cv2.imencode('.jpg', self.last_frame)
             bufsz, _ = jpeg.shape
@@ -72,6 +73,7 @@ class VideoCamera(object):
 
     async def get_frame(self):
         while self.last_idx == self.__jpegidx.value:
+            logger.info("Stalled on new JPEG")
             await sleep(1/30)
         self.last_idx = self.__jpegidx.value
         return self.last_jpeg[:self.__jpbufsz.value]
