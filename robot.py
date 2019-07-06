@@ -41,15 +41,15 @@ class Robot:
 
     def get_info(self):
         return {
-            "left": self.left,
-            "right": self.right,
+            "left": self.lr[0],
+            "right": self.lr[1],
             "last_command": self.last_cmd
         }
 
     async def __update_drive(self):
         while True:
-            inputs = np.array(self.sources.values())
-            input_lr = inputs.sum(dim=0)
+            inputs = np.array(list(self.sources.values()))
+            input_lr = inputs.sum(axis=0)
 
             self.lr = input_lr*(1-self.inertia) + self.lr*self.inertia
 
