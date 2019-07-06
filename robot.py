@@ -49,11 +49,12 @@ class Robot:
             self.left = left*(1-self.inertia) + self.left*self.inertia
             self.right = right*(1-self.inertia) + self.right*self.inertia
 
-            if left*right >= 0:
-                left = (self.left*2+self.right)/3
-                right = (self.right*2+self.left)/3
-            else:
-                left, right = self.left, self.right
+            left, right = self.left, self.right
+            #if left*right >= 0:
+            #    left = (self.left*2+self.right)/3
+            #    right = (self.right*2+self.left)/3
+            #else:
+                
 
             if self.left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
