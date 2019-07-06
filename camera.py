@@ -35,17 +35,10 @@ class VideoCamera(object):
         logger.info("Closed Camera 0.")
 
     def __capture(self):
-        jpeg_buf = BytesIO()
         while self.__halt_flag.value == 0:
-            success, frame = self.video.read()
-            H, W, C = frame.shape
-            #if i % 100 == 0:
-            #    lf = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-            #    kp =  orb.detect(lf, None)
-            #cv2.drawKeypoints(frame, kp, frame)
-            self.last_frame[:, :, :] = frame  #cv2.resize(frame, (W, H))
-            #encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
-            #ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
+            _, frame = self.video.read()
+            self.last_frame[:, :, :] = frame
+            jpeg_buf = BytesIO()
             img = Image.fromarray(frame)
             img.save(jpeg_buf, format="jpeg", quality=80, optimize=True, progressive=True)
             jpeg = np.frombuffer(jpeg_buf.getbuffer(), dtype=np.uint8)
