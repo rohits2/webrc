@@ -23,7 +23,7 @@ class VideoCamera(object):
         self.__jpbufsz = Value('i', 0)
         self.__halt_flag = Value('i', 0)
         self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H, W, C)
-        self.last_jpeg = np.frombuffer(self.__jpbuf.get_obj(), dtype=np.uint8).reshape(H * W * C, 1)
+        self.last_jpeg = np.frombuffer(self.__jpbuf.get_obj(), dtype=np.uint8).reshape(H * W * C * 2)
 
         self.img_proc = Process(target=self.__capture)
         self.img_proc.start()
@@ -49,6 +49,7 @@ class VideoCamera(object):
             img = Image.fromarray(frame)
             img.save(jpeg_buf, quality=80, optimize=True, progressive=True)
             jpeg = np.frombuffer(jpeg_buf, dtype=np.uint8)
+            print(jpeg.shape)
             bufsz, _ = jpeg.shape
             self.__jpbufsz.value = bufsz
             self.last_jpeg[:bufsz] = jpeg
