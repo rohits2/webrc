@@ -10,8 +10,8 @@ class VideoCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)
         logger.info("Opened Camera 0!")
-        self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-        self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 80)
+        self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         _, image = self.video.read()
         H, W, C = image.shape
         logger.info("Streaming {W}x{H}x{C} frames...".format(W=W, H=H, C=C))
