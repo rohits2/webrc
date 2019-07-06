@@ -28,18 +28,25 @@ class VideoCamera(object):
         self.img_proc = Process(target=self.__capture)
         self.img_proc.start()
 
+        self.encode_proc = Process(target=self.__encode)
+        self.encode_proc.start()
+
     def __del__(self):
         self.video.release()
         self.__halt_flag.value = 1
         self.img_proc.join()
+        self.encode_proc.join()
         logger.info("Closed Camera 0.")
 
     def __capture(self):
         while self.__halt_flag.value == 0:
             _, frame = self.video.read()
             self.last_frame[:, :, :] = frame
+
+    def __encode(self):
+        while self.__halt_flag.value == 0:
             jpeg_buf = BytesIO()
-            img = Image.fromarray(frame)
+            img = Image.fromarray(self.last_frame)
             img.save(jpeg_buf, format="jpeg", quality=80, optimize=True, progressive=True)
             jpeg = np.frombuffer(jpeg_buf.getbuffer(), dtype=np.uint8)
             self.__jpbufsz.value = jpeg.shape[0]
