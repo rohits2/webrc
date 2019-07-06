@@ -22,7 +22,7 @@ class Robot:
         self.sources = {}
         self.left = 0
         self.right = 0
-        self.inertia = 0.75
+        self.inertia = 0.25
         self.last_cmd = 0
         self.drive_task = None
 
@@ -50,11 +50,9 @@ class Robot:
             self.right = right*(1-self.inertia) + self.right*self.inertia
 
             left, right = self.left, self.right
-            #if left*right >= 0:
-            #    left = (self.left*2+self.right)/3
-            #    right = (self.right*2+self.left)/3
-            #else:
-                
+            if left*right >= 0:
+                left = (self.left*2+self.right)/3
+                right = (self.right*2+self.left)/3
 
             if self.left >= 0:
                 self.left_motor_bck.ChangeDutyCycle(0)
