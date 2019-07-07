@@ -64,18 +64,20 @@ class VideoCamera(object):
         while self.__halt_flag.value == 0:
             while self.__frameidx.value == last_idx:
                 bsleep(1/60)
-                logger.info("Stalled on new frame")
+                self.__quality_adjust.value += 1
                 continue
             if self.__quality_adjust.value > 5:
                 H = H*8//7
                 W = W*8//7
-                logger.info("Changed resolution to {W}x{H} dynamically")
+                logger.info(f"Changed resolution to {W}x{H} dynamically")
                 self.__quality_adjust.value = 0
             elif self.__quality_adjust.value < 5:
                 H = H*7//8
                 W = W*7//8
-                logger.info("Changed resolution to {W}x{H} dynamically")
+                logger.info(f"Changed resolution to {W}x{H} dynamically")
                 self.__quality_adjust.value = 0
+            W = max(W, 120)
+            H = max(H, 160)
             frame = cv2.resize(self.last_frame, (W, H))
             ret, jpeg = cv2.imencode('.jpg', frame)
             bufsz, _ = jpeg.shape
@@ -87,8 +89,8 @@ class VideoCamera(object):
 
     async def get_frame(self):
         while self.last_idx == self.__jpegidx.value:
-            self.__quality_adjust.value += 1
+            self.__quality_adjust.value -= 1
             await sleep(1/30)
-        self.__quality_adjust.value -= 1
+        self.__quality_adjust.value += 1
         self.last_idx = self.__jpegidx.value
         return self.last_jpeg[:self.__jpbufsz.value]
