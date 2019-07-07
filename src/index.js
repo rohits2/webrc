@@ -74,6 +74,7 @@ function update() {
         statDiv.innerHTML = "HALT/DISCONNECTED";
         statDiv.style.color = "darkred";
     }
+    gamepadUpdate();
     sendCommand();
 }
 function sendCommand() {
