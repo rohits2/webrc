@@ -59,12 +59,12 @@ class VideoCamera(object):
 
     def __encode(self):
         last_idx = 0
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
         while self.__halt_flag.value == 0:
             while self.__frameidx.value == last_idx:
                 bsleep(1/60)
-                #logger.info("Stalled on new frame")
                 continue
-            ret, jpeg = cv2.imencode('.jpg', self.last_frame)
+            ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
             bufsz, _ = jpeg.shape
             self.__jpbufsz.value = bufsz
             self.last_jpeg[:bufsz] = jpeg
