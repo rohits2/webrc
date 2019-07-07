@@ -63,6 +63,7 @@ class VideoCamera(object):
         while self.__halt_flag.value == 0:
             while self.__frameidx.value == last_idx:
                 bsleep(1/60)
+                logger.info("Stalled on new frame")
                 continue
             ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
             bufsz, _ = jpeg.shape
