@@ -64,6 +64,10 @@ function keyUp(event) {
 }
 function gamepadUpdate() {
     if (gamepad) {
+        controls.fwd = -gamepad.axes[0];
+        controls.bck = 0;
+        controls.left = -gamepad.axes[1];
+        controls.right = 0;
         console.log("FWD " + gamepad.axes[0] + " LR " + gamepad.axes[1]);
     }
 }
