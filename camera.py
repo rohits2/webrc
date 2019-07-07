@@ -67,13 +67,13 @@ class VideoCamera(object):
                 self.__quality_adjust.value += 1
                 continue
             if self.__quality_adjust.value > 5:
-                H = H*8//7
                 W = W*8//7
+                H = W*3//4
                 logger.info("Changed resolution to {W}x{H} dynamically".format(W=W, H=H))
                 self.__quality_adjust.value = 0
             elif self.__quality_adjust.value < 5:
-                H = H*7//8
                 W = W*7//8
+                H = W*3//4
                 logger.info("Changed resolution to {W}x{H} dynamically".format(W=W, H=H))
                 self.__quality_adjust.value = 0
             W = max(W, 120)
