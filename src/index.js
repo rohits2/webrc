@@ -4,6 +4,7 @@ var lagDiv;
 var statDiv;
 var commandSocket;
 var telemetrySocket;
+var gamepad;
 var controls = {
     fwd: 0,
     bck: 0,
@@ -24,6 +25,7 @@ function getWebSocketURI(socketName) {
     return new_uri;
 }
 function init() {
+    setupGamepad();
     leftPWM = document.getElementById('left_pwm');
     rightPWM = document.getElementById('right_pwm');
     lagDiv = document.getElementById('lag_div');
@@ -60,8 +62,10 @@ function keyUp(event) {
     controls.fwd = key == 87 || key == 38 ? 0 : controls.fwd;
     controls.bck = key == 83 || key == 40 ? 0 : controls.bck;
 }
-function a(b) {
-    return b ? 1 : 0;
+function gamepadUpdate() {
+    if (gamepad) {
+        console.log(gamepad.axes);
+    }
 }
 function update() {
     if (telemetrySocket.readyState == telemetrySocket.CLOSED) {
@@ -81,4 +85,10 @@ function sendCommand() {
         'right': right,
         'time': Date.now()
     }));
+}
+function setupGamepad() {
+    window.addEventListener("gamepadconnected", function (e) {
+        console.log("Gamepad connected at index %d: %s.", e.gamepad.index, e.gamepad.id);
+        gamepad = navigator.getGamepads()[e.gamepad.index];
+    });
 }

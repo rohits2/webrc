@@ -6,6 +6,8 @@ var statDiv: HTMLDivElement;
 var commandSocket: WebSocket;
 var telemetrySocket: WebSocket;
 
+var gamepad: Gamepad;
+
 var controls = {
     fwd: 0,
     bck: 0,
@@ -27,6 +29,8 @@ function getWebSocketURI(socketName) {
 }
 
 function init() {
+    setupGamepad();
+
     leftPWM = <HTMLProgressElement>document.getElementById('left_pwm')
     rightPWM = <HTMLProgressElement>document.getElementById('right_pwm')
     lagDiv = <HTMLDivElement>document.getElementById('lag_div')
@@ -49,8 +53,8 @@ function updateTelemetry(event) {
     rightPWM.value = 100 * Math.abs(blob['right']);
     var currentTime = Date.now()
     var lastTime = blob['last_command']
-    latency = (latency*0.95) + ((currentTime - lastTime)*0.05)
-    lagDiv.innerHTML = Math.max(Math.ceil(latency),0) + " ms";
+    latency = (latency * 0.95) + ((currentTime - lastTime) * 0.05)
+    lagDiv.innerHTML = Math.max(Math.ceil(latency), 0) + " ms";
 
 }
 function keyDown(event: KeyboardEvent) {
@@ -69,12 +73,14 @@ function keyUp(event: KeyboardEvent) {
     controls.bck = key == 83 || key == 40 ? 0 : controls.bck;
 }
 
-function a(b){
-    return b ? 1 : 0;
+function gamepadUpdate(){
+    if(gamepad){
+        console.log(gamepad.axes);
+    }
 }
 
-function update(){
-    if(telemetrySocket.readyState == telemetrySocket.CLOSED){
+function update() {
+    if (telemetrySocket.readyState == telemetrySocket.CLOSED) {
         lagDiv.innerHTML = "∞"
         lagDiv.style.color = "darkred"
         statDiv.innerHTML = "HALT/DISCONNECTED"
@@ -93,4 +99,11 @@ function sendCommand() {
             'right': right,
             'time': Date.now()
         }))
+}
+
+function setupGamepad() {
+    window.addEventListener("gamepadconnected", function (e: GamepadEvent) {
+        console.log("Gamepad connected at index %d: %s.", e.gamepad.index, e.gamepad.id);
+        gamepad = navigator.getGamepads()[e.gamepad.index];
+    });
 }
