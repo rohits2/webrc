@@ -75,11 +75,11 @@ function keyUp(event: KeyboardEvent) {
 
 function gamepadUpdate(){
     if(gamepad){
-        controls.fwd = -gamepad.axes[0];
+        controls.fwd = -gamepad.axes[1];
         controls.bck = 0;
-        controls.left = -gamepad.axes[1];
+        controls.left = -gamepad.axes[0];
         controls.right = 0;
-        console.log("FWD "+gamepad.axes[0] + " LR "+gamepad.axes[1]);
+        console.log("FWD "+gamepad.axes[1] + " LR "+gamepad.axes[0]);
     }
 }
 
