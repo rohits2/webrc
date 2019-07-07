@@ -23,6 +23,7 @@ class VideoCamera(object):
         self.__jpbufsz = Value('i', 0)
         self.__frameidx = Value('i', 0)
         self.__jpegidx = Value('i', 0)
+        self.__quality_adjust = Value('i', 0)
         self.__halt_flag = Value('i', 0)
         self.last_frame = np.frombuffer(self.__imbuf.get_obj(), dtype=np.uint8).reshape(H, W, C)
         self.last_jpeg = np.frombuffer(self.__jpbuf.get_obj(), dtype=np.uint8).reshape(H * W * C * 2, 1)
@@ -59,13 +60,24 @@ class VideoCamera(object):
 
     def __encode(self):
         last_idx = 0
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
+        H, W = 480, 640
         while self.__halt_flag.value == 0:
             while self.__frameidx.value == last_idx:
                 bsleep(1/60)
                 logger.info("Stalled on new frame")
                 continue
-            ret, jpeg = cv2.imencode('.jpg', self.last_frame, encode_param)
+            if self.__quality_adjust.value > 5:
+                H = H*8//7
+                W = W*8//7
+                logger.info("Changed resolution to {W}x{H} dynamically")
+                self.__quality_adjust.value = 0
+            elif self.__quality_adjust.value < 5:
+                H = H*7//8
+                W = W*7//8
+                logger.info("Changed resolution to {W}x{H} dynamically")
+                self.__quality_adjust.value = 0
+            frame = cv2.resize(self.last_frame, (W, H))
+            ret, jpeg = cv2.imencode('.jpg', frame)
             bufsz, _ = jpeg.shape
             self.__jpbufsz.value = bufsz
             self.last_jpeg[:bufsz] = jpeg
@@ -75,7 +87,8 @@ class VideoCamera(object):
 
     async def get_frame(self):
         while self.last_idx == self.__jpegidx.value:
-            logger.info("Stalled on new JPEG")
+            self.__quality_adjust.value += 1
             await sleep(1/30)
+        self.__quality_adjust.value -= 1
         self.last_idx = self.__jpegidx.value
         return self.last_jpeg[:self.__jpbufsz.value]
