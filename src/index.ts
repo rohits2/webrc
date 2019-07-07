@@ -75,7 +75,7 @@ function keyUp(event: KeyboardEvent) {
 
 function gamepadUpdate(){
     if(gamepad){
-        console.log(gamepad.axes);
+        console.log("FWD "+gamepad.axes[0] + "LR "+gamepad.axes[1]);
     }
 }
 
