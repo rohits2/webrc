@@ -53,11 +53,11 @@ class Robot:
 
             self.lr = input_lr*(1-self.inertia) + self.lr*self.inertia
 
-            regularizer = abs(self.lr.sum())/2
-            lr_reg_matrix = np.eye(2)
-            lr_reg_matrix[0,1] = regularizer
-            lr_reg_matrix[1,0] = regularizer
-            self.lr = (lr_reg_matrix@self.lr)/(1+regularizer)
+            #regularizer = abs(self.lr.sum())/2
+            #lr_reg_matrix = np.eye(2)
+            #lr_reg_matrix[0,1] = regularizer
+            #lr_reg_matrix[1,0] = regularizer
+            #self.lr = (lr_reg_matrix@self.lr)/(1+regularizer)
 
             left, right = self.lr
 
