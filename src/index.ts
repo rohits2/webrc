@@ -75,7 +75,7 @@ function keyUp(event: KeyboardEvent) {
 
 function gamepadUpdate(){
     if(gamepad){
-        console.log("FWD "+gamepad.axes[0] + "LR "+gamepad.axes[1]);
+        console.log("FWD "+gamepad.axes[1] + " LR "+gamepad.axes[0]);
     }
 }
 
@@ -93,7 +93,7 @@ function update() {
 function sendCommand() {
     let left = controls.fwd - controls.bck + controls.right - controls.left;
     let right = controls.fwd - controls.bck + controls.left - controls.right;
-    console.log("L " + controls.left + " R " + controls.right + " FWD " + controls.fwd + " BCK " + controls.bck);
+    //console.log("L " + controls.left + " R " + controls.right + " FWD " + controls.fwd + " BCK " + controls.bck);
     commandSocket.send(
         JSON.stringify({
             'left': left,
