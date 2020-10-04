@@ -69,6 +69,7 @@ async def command_feed(request, ws):
 async def telemetry_feed(request, ws):
     while True:
         info = robot.get_info()
+        info.update(cam.get_info())
         await ws.send(json.dumps(info))
         await sleep(0.045)
 

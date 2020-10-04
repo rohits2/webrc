@@ -12,8 +12,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     overflow: hidden;" onload='init();'>
-    <div
-        style="position: absolute; top: 10%; padding: 5px; left: 0; width: match-content; font-family: 'Inconsolata', monospace; color: white; background-color: rgba(0,0,0,0.5);">
+    <div style="position: absolute; top: 10%; padding: 5px; left: 0; width: match-content; font-family: 'Inconsolata', monospace; color: white; background-color: rgba(0,0,0,0.5);">
         <h3>Remote Controls</h3>
         <hr>
         <h4>Navigation</h4>
@@ -36,6 +35,19 @@
                 <td>Latency</td>
                 <td>
                     <div id='lag_div'></div>
+                </td>
+            </tr>
+            <hr>
+            <tr>
+                <td>Quality</td>
+                <td>
+                    <div id='quality_div'></div>
+                </td>
+            </tr>
+            <tr>
+                <td>Framerate</td>
+                <td>
+                    <div id='frametime_div'></div>
                 </td>
             </tr>
         </table>

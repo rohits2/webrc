@@ -1,6 +1,8 @@
 var leftPWM: HTMLProgressElement;
 var rightPWM: HTMLProgressElement;
 var lagDiv: HTMLDivElement;
+var qualityDiv: HTMLDivElement;
+var frametimeDiv: HTMLDivElement;
 var statDiv: HTMLDivElement;
 
 var commandSocket: WebSocket;
@@ -34,6 +36,8 @@ function init() {
     leftPWM = <HTMLProgressElement>document.getElementById('left_pwm')
     rightPWM = <HTMLProgressElement>document.getElementById('right_pwm')
     lagDiv = <HTMLDivElement>document.getElementById('lag_div')
+    qualityDiv = <HTMLDivElement>document.getElementById('quality_div')
+    frametimeDiv = <HTMLDivElement>document.getElementById('frametime_div')
     statDiv = <HTMLDivElement>document.getElementById('stat_div')
 
     document.addEventListener("keydown", keyDown);
@@ -47,7 +51,7 @@ function init() {
 }
 function updateTelemetry(event) {
     var blob = JSON.parse(event.data);
-    statDiv.innerHTML = "READY/RUNNING";
+    statDiv.innerHTML = "READY/ONLINE";
     statDiv.style.color = "lightgreen";
     leftPWM.value = 100 * Math.abs(blob['left']);
     rightPWM.value = 100 * Math.abs(blob['right']);
@@ -55,8 +59,10 @@ function updateTelemetry(event) {
     var lastTime = blob['last_command']
     latency = (latency * 0.95) + ((currentTime - lastTime) * 0.05)
     lagDiv.innerHTML = Math.max(Math.ceil(latency), 0) + " ms";
-
+    qualityDiv.innerHTML = blob['resolution'][0] + "x" + blob['resolution'][1];
+    frametimeDiv.innerHTML = Math.ceil(blob['framerate']) + " fps";
 }
+
 function keyDown(event: KeyboardEvent) {
     let key = event.keyCode;
     controls.left = key == 65 || key == 37 ? 1 : controls.left;
@@ -84,10 +90,10 @@ function gamepadUpdate(){
 }
 
 function update() {
-    if (telemetrySocket.readyState == telemetrySocket.CLOSED) {
+    if (telemetrySocket.readyState != telemetrySocket.OPEN || ) {
         lagDiv.innerHTML = "∞"
         lagDiv.style.color = "darkred"
-        statDiv.innerHTML = "HALT/DISCONNECTED"
+        statDiv.innerHTML = "HALT/UNKNOWN"
         statDiv.style.color = "darkred"
     }
     gamepadUpdate();

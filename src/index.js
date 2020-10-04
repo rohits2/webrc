@@ -1,6 +1,8 @@
 var leftPWM;
 var rightPWM;
 var lagDiv;
+var qualityDiv;
+var frametimeDiv;
 var statDiv;
 var commandSocket;
 var telemetrySocket;
@@ -29,6 +31,8 @@ function init() {
     leftPWM = document.getElementById('left_pwm');
     rightPWM = document.getElementById('right_pwm');
     lagDiv = document.getElementById('lag_div');
+    qualityDiv = document.getElementById('quality_div');
+    frametimeDiv = document.getElementById('frametime_div');
     statDiv = document.getElementById('stat_div');
     document.addEventListener("keydown", keyDown);
     document.addEventListener("keyup", keyUp);
@@ -39,7 +43,7 @@ function init() {
 }
 function updateTelemetry(event) {
     var blob = JSON.parse(event.data);
-    statDiv.innerHTML = "READY/RUNNING";
+    statDiv.innerHTML = "READY/ONLINE";
     statDiv.style.color = "lightgreen";
     leftPWM.value = 100 * Math.abs(blob['left']);
     rightPWM.value = 100 * Math.abs(blob['right']);
@@ -47,6 +51,8 @@ function updateTelemetry(event) {
     var lastTime = blob['last_command'];
     latency = (latency * 0.95) + ((currentTime - lastTime) * 0.05);
     lagDiv.innerHTML = Math.max(Math.ceil(latency), 0) + " ms";
+    qualityDiv.innerHTML = blob['resolution'][0] + "x" + blob['resolution'][1];
+    frametimeDiv.innerHTML = Math.ceil(blob['framerate']) + " fps";
 }
 function keyDown(event) {
     var key = event.keyCode;
@@ -72,10 +78,10 @@ function gamepadUpdate() {
     }
 }
 function update() {
-    if (telemetrySocket.readyState == telemetrySocket.CLOSED) {
+    if (telemetrySocket.readyState != telemetrySocket.OPEN) {
         lagDiv.innerHTML = "∞";
         lagDiv.style.color = "darkred";
-        statDiv.innerHTML = "HALT/DISCONNECTED";
+        statDiv.innerHTML = "HALT/UNKNOWN";
         statDiv.style.color = "darkred";
     }
     gamepadUpdate();
