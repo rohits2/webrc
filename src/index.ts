@@ -90,7 +90,7 @@ function gamepadUpdate(){
 }
 
 function update() {
-    if (telemetrySocket.readyState != telemetrySocket.OPEN || ) {
+    if (telemetrySocket.readyState != telemetrySocket.OPEN) {
         lagDiv.innerHTML = "∞"
         lagDiv.style.color = "darkred"
         statDiv.innerHTML = "HALT/UNKNOWN"
