@@ -1,11 +1,15 @@
 #!/usr/bin/env python
+from os import environ
 
 from sanic import Sanic, response
 from sanic_compress import Compress
 import json
 from jinja2 import Template
 from camera import VideoCamera
-from robot import Robot
+if 'FAKE_ROBOT' not in environ:
+    from robot import Robot
+else:
+    from fake_robot import Robot
 from asyncio import sleep
 from loguru import logger
 import cv2
