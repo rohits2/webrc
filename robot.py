@@ -1,77 +1,62 @@
 import RPi.GPIO as GPIO
 import numpy as np
-from asyncio import sleep, ensure_future
 from datetime import datetime
+from collections import namedtuple
 
-LEFT_PINS = (38,40)
-RIGHT_PINS = (3,5)
+from system import daemonize
+
+PWMConfig = namedtuple("PWMConfig", "neg", "pos", "tach")
+
+PWM_FREQUENCY = 50
+
+LEFT_PINS = PWMConfig(7, 8, 25)
+RIGHT_PINS = PWMConfig(22, 27, 17)
 
 
-def sgn(x):
-    return 1 if x >= 0 else -1
+class Motor:
+    def __init__(self, pwm_config: PWMConfig):
+        self.pwm_config = pwm_config
+        self.pwm = GPIO.PWM(pwm_config.tach, PWM_FREQUENCY)
+        self.running = False
 
-def power_curve(x, lmbda):
-    return sgn(x)*abs(x)**lmbda
+    def drive(self, x: float):
+        if not self.running:
+            self.pwm.start()
+            self.running = True
+        pos = x > 0
+        GPIO.output([self.pwm_config.pos, self.pwm_config.neg], [pos, not pos])
+        self.pwm.ChangeDutyCycle(abs(x * 100))
+
 
 class Robot:
     def __init__(self):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(LEFT_PINS, GPIO.OUT)
         GPIO.setup(RIGHT_PINS, GPIO.OUT)
-        self.left_motor_fwd = GPIO.PWM(*LEFT_PINS)
-        self.left_motor_bck = GPIO.PWM(*LEFT_PINS[::-1])
-        self.right_motor_fwd = GPIO.PWM(*RIGHT_PINS)
-        self.right_motor_bck = GPIO.PWM(*RIGHT_PINS[::-1])
-        self.left_motor_fwd.start(0)
-        self.left_motor_bck.start(0)
-        self.right_motor_fwd.start(0)
-        self.right_motor_bck.start(0)
+        self.left_motor = Motor(LEFT_PINS)
+        self.right_motor = Motor(RIGHT_PINS)
+
         self.sources = {}
-        self.lr = np.array([0., 0.])
+        self.lr = np.array([0.0, 0.0])
         self.inertia = 0.25
         self.last_cmd = 0
-        self.drive_task = None
 
     def drive(self, left, right, cmd_time=datetime.now().timestamp(), source="tele"):
         self.sources[source] = (left, right)
         self.last_cmd = cmd_time
-        if self.drive_task is None:
-            self.drive_task = self.__update_drive
-            ensure_future(self.drive_task())
+        self.__update_drive()
 
     def get_info(self):
-        return {
-            "left": self.lr[0],
-            "right": self.lr[1],
-            "last_command": self.last_cmd
-        }
+        return {"left": self.lr[0], "right": self.lr[1], "last_command": self.last_cmd}
 
-    async def __update_drive(self):
-        while True:
-            inputs = np.array(list(self.sources.values()))
-            input_lr = inputs.sum(axis=0)
+    
+    @daemonize(interval=0.1, critical=True, max_failures=3)
+    def __update_drive(self):
+        inputs = np.array(list(self.sources.values()))
+        input_lr = inputs.sum(axis=0)
 
-            self.lr = input_lr*(1-self.inertia) + self.lr*self.inertia
+        self.lr = input_lr * (1 - self.inertia) + self.lr * self.inertia
 
-            #regularizer = abs(self.lr.sum())/2
-            #lr_reg_matrix = np.eye(2)
-            #lr_reg_matrix[0,1] = regularizer
-            #lr_reg_matrix[1,0] = regularizer
-            #self.lr = (lr_reg_matrix@self.lr)/(1+regularizer)
-
-            left, right = self.lr
-
-            if left >= 0:
-                self.left_motor_bck.ChangeDutyCycle(0)
-                self.left_motor_fwd.ChangeDutyCycle(int(100*left))
-            else:
-                self.left_motor_fwd.ChangeDutyCycle(0)
-                self.left_motor_bck.ChangeDutyCycle(int(-100*left))
-
-            if right >= 0:
-                self.right_motor_bck.ChangeDutyCycle(0)
-                self.right_motor_fwd.ChangeDutyCycle(int(100*right))
-            else:
-                self.right_motor_fwd.ChangeDutyCycle(0)
-                self.right_motor_bck.ChangeDutyCycle(int(-100*right))
-            await sleep(0.1)
+        left, right = self.lr
+        self.left_motor.drive(left)
+        self.right_motor.drive(right)
